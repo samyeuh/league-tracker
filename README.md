@@ -5,7 +5,6 @@ bot discord tracker league of legends
 # todo:
 
 ### config:
-- choix la région
 - choix du channel
 - différents paramètres (jsp)
 
