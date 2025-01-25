@@ -22,7 +22,7 @@ class LinkModal(ui.Modal, title="link your account"):
         self.add_item(self.tag)
 
     async def on_submit(self, interaction: Interaction):
-        embed = discord.Embed(title="Account linked", description=f"your account **{self.name}#{self.tag}** has been linked to region **{self.region.upper()}**", color=discord.Color.green())
+        embed = discord.Embed(title="Account linked", description=f"your account **{self.name}#{self.tag}** has been linked to region **{self.region.value.upper()}**", color=discord.Color.green())
         await interaction.response.send_message(embed=embed)
     
 class LeagueCommands(commands.Cog):
