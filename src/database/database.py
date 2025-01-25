@@ -48,3 +48,5 @@ class Database:
    def getStinksOn(self):
       return self.stinkson
     
+   def getPlayer(self):
+        return self.player
