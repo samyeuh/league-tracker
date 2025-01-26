@@ -14,7 +14,7 @@ bot discord tracker league of legends
 
 ### in channel - automatique:
 - message à chaque fin de ranked (+/- lp)
-- récap chaque jour
+- récap chaque jour avec streak
 - is league down ?
 
 ### patch tracker ?
