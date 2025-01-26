@@ -2,14 +2,20 @@
 class Server:
     def __init__(self, database):
         self.cursor = database.getCursor()
-
-    def add_server(self, discord_id):
+        self.conn = database.getConn()
+    
+    def add_server(self, discord_id, channel_id):
         """
         Add a server to the database.
 
         :param discord_id: The discord id of server.
+        :param discord_id: The discord id of channel.
         """
-        self.cursor.execute(f"INSERT INTO Serveur (discordId) VALUES ({discord_id})")
+        try:
+            self.cursor.execute(f"INSERT INTO Server (discordId, channelId) VALUES (?, ?)", (discord_id, channel_id))
+            self.conn.commit()
+        except Exception as e:
+            print(e)
 
     def get_server(self, discord_id):
         """
@@ -17,7 +23,8 @@ class Server:
 
         :param discord_id: The discord id of server.
         """
-        self.cursor.execute(f"SELECT * FROM Serveur WHERE discordId = {discord_id}")
+        self.cursor.execute(f"SELECT * FROM Server WHERE discordId = ?", (discord_id))
+        self.conn.commit()
         return self.cursor.fetchone()
 
     def remove_server(self, discord_id):
@@ -26,4 +33,5 @@ class Server:
 
         :param discord_id: The discord id of server.
         """
-        self.cursor.execute(f"DELETE FROM Serveur WHERE discordId = {discord_id}")
+        self.cursor.execute(f"DELETE FROM Server WHERE discordId =  ?", (discord_id))
+        self.conn.commit()

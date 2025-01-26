@@ -3,18 +3,21 @@ class Player:
         self.stinkson = database.getStinksOn()
         self.server = database.getServer()
         self.cursor = database.getCursor()
+        self.conn = database.getConn()
 
-    def add_player(self, discord_id, region, summoner_name, serverDiscordId):
+    def add_player(self, discord_id, region, summoner_name, summoner_id, serverDiscordId):
         """
         Add a player on the database.
 
         :param discord_id: The discord id of the player.
         :param region: The region of the player.
         :param summoner_name: The summoner name of the player.
+        :param summoner_id: The summoner id of the player.
+        :param serverDiscordId: The guild id of the player.
         """
 
-        self.cursor.execute(f"INSERT INTO players (discord_id, region, summoner_name) VALUES ({discord_id}, {region}, {summoner_name})")
-
+        self.cursor.execute(f"INSERT INTO players (discordId, region, summonerName, summonerId) VALUES (?, ?, ?, ?)", (discord_id, region, summoner_name, summoner_id))
+        self.conn.commit()
         player = self.get_player(discord_id)
         if player is None:
             return Exception("Player not found")
@@ -33,13 +36,15 @@ class Player:
         :param discord_id: The discord id of the player.
         """
 
-        self.cursor.execute(f"SELECT * FROM players WHERE discord_id = {discord_id}")
+        self.cursor.execute(f"SELECT * FROM players WHERE discord_id = ?", (discord_id))
+        self.conn.commit()
         return self.cursor.fetchone()
 
     def remove_player(self, server_id, player_id):
         """
         Remove a player from the database.
 
+        :param server_id: The discord id of the server.
         :param discord_id: The discord id of the player.
         """
 
@@ -49,7 +54,8 @@ class Player:
         self.stinkson.remove_stinkson(server_id, player_id)
 
         if len(self.stinkson.get_servers(player_id)) == 0:
-            self.cursor.execute(f"DELETE FROM players WHERE discord_id = {player_id}")
+            self.cursor.execute(f"DELETE FROM players WHERE discord_id = ?", (player_id))
+            self.conn.commit()
             return True
         else:
             return False

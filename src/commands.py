@@ -3,11 +3,12 @@ from tracker import Tracker
 from database.database import Database
 from discord import app_commands, Interaction, TextChannel, ui, TextStyle, SelectOption
 from discord.ext import commands
+from utils.checker import checkLink
 
 class LinkModal(ui.Modal, title="link your account"):
-    def __init__(self):
+    def __init__(self, tracker: Tracker):
         super().__init__()
-    
+        self.tracker = tracker
         self.region = ui.TextInput(
             label="Region",
             style=TextStyle.short,
@@ -16,13 +17,32 @@ class LinkModal(ui.Modal, title="link your account"):
             max_length=10,
         )
         self.add_item(self.region)
-        self.name = ui.TextInput(label="Username", style=TextStyle.short, placeholder="in league#tracker, league is the username", required=True, max_length=30)
+        self.name = ui.TextInput(label="Gamename", style=TextStyle.short, placeholder="in league#tracker, league is the gamename", required=True, max_length=16)
         self.add_item(self.name)
-        self.tag = ui.TextInput(label="Tag", style=TextStyle.short, placeholder="in league#tracker, tracker is the tag", required=True, max_length=30)
+        self.tag = ui.TextInput(label="Tag", style=TextStyle.short, placeholder="in league#tracker, tracker is the tag", required=True, max_length=16)
         self.add_item(self.tag)
 
     async def on_submit(self, interaction: Interaction):
-        embed = discord.Embed(title="Account linked", description=f"your account **{self.name}#{self.tag}** has been linked to region **{self.region.value.upper()}**", color=discord.Color.green())
+        self.region = self.region.value.upper()
+        errorEmbed = discord.Embed(title="Account not linked", description=f"Informations given (**{self.name}#{self.tag}** in region **{self.region}**) are incorrect, please check it and retry.", color=discord.Color.red())
+        okEmbed = discord.Embed(title="Account linked", description=f"your account **{self.name}#{self.tag}** has been linked to region **{self.region}**", color=discord.Color.green())
+
+        if not checkLink(self.region, self.name, self.tag):
+            errorEmbed.description += " Erreur lors du checklink"
+            embed = errorEmbed
+            await interaction.response.send_message(embed=embed)
+            return
+        if not interaction.guild:
+            raise ValueError("Guild ID is missing")
+        
+        try:
+            self.tracker.link(interaction.user, self.region, self.name, self.tag, interaction.guild.id)
+            embed = okEmbed
+        except Exception as e:
+            print(e)
+            errorEmbed.description += " Erreur lors du link + " + str(e)
+            embed = errorEmbed
+        
         await interaction.response.send_message(embed=embed)
     
 class LeagueCommands(commands.Cog):
@@ -34,15 +54,20 @@ class LeagueCommands(commands.Cog):
     """
     COMMANDES POUR ADMINISTRATEURS
     """
-    async def is_admin(ctx):
-        return ctx.member.roles.cache.has('Administrator')
+    async def is_admin(interaction: discord.Interaction) -> bool:
+        """Vérifie si l'utilisateur a les permissions administrateur."""
+        return interaction.user.guild_permissions.administrator
 
     @app_commands.command(name="setup", description="Sets a special channel for the server")
     @app_commands.check(is_admin)
     async def setup(self, interaction: discord.Interaction, channel: TextChannel):
         """Initialise le bot pour le serveur"""
-        self.tracker.setup(channel, interaction.guild_id)
-        await interaction.response.send_message(f'Initialising bot in {channel.name}')
+        try:
+            self.tracker.setup(channel, interaction.guild_id)
+        except Exception as e:
+            await interaction.response.send_message(f'Error during setup: {e}', ephemeral=True)
+        else:
+            await interaction.response.send_message(f'Initialising bot in {channel.name}')
 
     """
     COMMANDES POUR UTILISATEURS
@@ -62,7 +87,7 @@ class LeagueCommands(commands.Cog):
     async def link(self, interaction: Interaction):
         """Lié ton compte discord à ton compte League of legends"""
         # TODO: Implement this
-        await interaction.response.send_modal(LinkModal())
+        await interaction.response.send_modal(LinkModal(self.tracker))
 
     @app_commands.command(name="unlink", description="Unlink your discord account to your League of legends account")
     async def unlink(self, interaction: Interaction):

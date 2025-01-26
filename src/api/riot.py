@@ -6,9 +6,12 @@ puuid_url = "https://{region}.api.riotgames.com/riot/account/v1/accounts/by-puui
 def get_riot_account(region, name, tag):
     response = requests.get(nametag_url.format(region=region, name=name, tag=tag))
     if response.status_code == 200:
-        return response.json()
+        data = response.json()
+        if not data.get('puuid'):
+            raise ValueError("Invalid Riot account data: missing PUUID")
+        return data
     else:
-        raise Exception("Error while getting account")
+        raise Exception(f"Error while getting account: {response.status_code} - {response.text}")
 
 def get_riot_account_by_puuid(region, puuid):
     response = requests.get(puuid_url.format(region=region, puuid=puuid))
