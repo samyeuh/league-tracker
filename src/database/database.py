@@ -13,6 +13,7 @@ class Database:
                   UNIQUE(discordId)
                );
             ''')
+         # TODO: ajouter region et puuid
          self.cursor.execute('''CREATE TABLE IF NOT EXISTS Player(
                   id INT,
                   discordId BIGINT NOT NULL,
