@@ -5,11 +5,10 @@ bot discord tracker league of legends
 # todo:
 
 ### config:
-- choix du channel
-- différents paramètres (jsp)
+- choix du channel ✅
 
 ### in channel - commands:
-- lié compte riot à compte discord
+- lié compte riot à compte discord ✅
 - leaderbord / classement
 
 ### in channel - automatique:
