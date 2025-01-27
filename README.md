@@ -9,6 +9,7 @@ bot discord tracker league of legends
 
 ### in channel - commands:
 - lié compte riot à compte discord ✅
+- profil (stats)
 - leaderbord / classement
 
 ### in channel - automatique:
