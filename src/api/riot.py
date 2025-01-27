@@ -1,6 +1,6 @@
 import requests
 
-api_key = "?api_key=RGAPI-4f36f2f7-cc01-4c45-8647-a87121b14107"
+api_key = ""
 nametag_url = "https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}{api_key}"
 puuid_url = "https://{region}.api.riotgames.com/riot/account/v1/accounts/by-puuid/{puuid}"
 
