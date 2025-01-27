@@ -9,7 +9,7 @@ class StinksOn:
 
         :param server_id:
         """
-        self.cursor.execute(f"INSERT INTO stinkson (server_id, player_id) VALUES (?, ?)", (server_id, player_id))
+        self.cursor.execute(f"INSERT INTO stinkson (serverId, playerId) VALUES (?, ?)", (server_id, player_id))
         self.conn.commit()
 
     def get_players(self, server_id):
@@ -18,7 +18,7 @@ class StinksOn:
 
         :param server_id: The id of the server.
         """
-        self.cursor.execute(f"SELECT * FROM stinkson WHERE server_id = ?", (server_id))
+        self.cursor.execute(f"SELECT * FROM stinkson WHERE serverId = ?", (server_id))
         self.conn.commit()
         return self.cursor.fetchall()
 

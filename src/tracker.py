@@ -1,4 +1,4 @@
-from discord import TextChannel
+from discord import TextChannel, TextInput
 from functools import wraps
 import api.riot
 from database.database import Database
@@ -28,19 +28,15 @@ class Tracker:
     def sendError(self, message: str):
         return message
         
-    def link(self, user, region: str, name: str, tag: str, serverDiscordId):
+    def link(self, user, region: str, name: TextInput, tag: TextInput, serverDiscordId):
         if not checker.checkSetup(self.server, serverDiscordId):
             return Exception("Setup not done")
-        try:
-            result = api.riot.get_riot_account(region, name, tag)
-            account = name + "#" + tag
-            accountId = result.get('puuid') # TODO: fix
-            if accountId is None:
-                print("Error while getting account")
-                return Exception("Error while getting account")
-            self.player.add_player(user.id, region, account, accountId, serverDiscordId)
-        except Exception as e:
-            return e
+        result = api.riot.get_riot_account(region, name, tag)
+        account = name.value + "#" + tag.value
+        accountId = result.get('puuid')
+        if accountId is None:
+            return Exception("Error while getting account")
+        self.player.add_player(user.id, region, account, accountId, serverDiscordId)
         
     @requires_setup
     def unlink(self):

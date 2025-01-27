@@ -25,7 +25,7 @@ async def load_extension():
 
 async def main():
     await load_extension()
-    await bot.start('')
+    await bot.start('MTMzMjMyNzg4NDc0Mzc3MDEyNA.GGDfQj.T5zjrRU8eYKk929-km9cyNzj9pRTkS4NlKkTQM')
     
 if __name__ == "__main__":
     asyncio.run(main())

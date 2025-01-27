@@ -1,10 +1,13 @@
 import requests
 
-nametag_url = "https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}"
+api_key = "?api_key=RGAPI-4f36f2f7-cc01-4c45-8647-a87121b14107"
+nametag_url = "https://{region}.api.riotgames.com/riot/account/v1/accounts/by-riot-id/{name}/{tag}{api_key}"
 puuid_url = "https://{region}.api.riotgames.com/riot/account/v1/accounts/by-puuid/{puuid}"
 
 def get_riot_account(region, name, tag):
-    response = requests.get(nametag_url.format(region=region, name=name, tag=tag))
+    if region == "EUW":
+        region = "europe"
+    response = requests.get(nametag_url.format(region=region, name=name, tag=tag, api_key=api_key))
     if response.status_code == 200:
         data = response.json()
         if not data.get('puuid'):

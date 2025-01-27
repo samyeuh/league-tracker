@@ -1,3 +1,5 @@
+import sqlite3
+
 class Player:
     def __init__(self, database):
         self.stinkson = database.getStinksOn()
@@ -15,8 +17,10 @@ class Player:
         :param summoner_id: The summoner id of the player.
         :param serverDiscordId: The guild id of the player.
         """
-
-        self.cursor.execute(f"INSERT INTO players (discordId, region, summonerName, summonerId) VALUES (?, ?, ?, ?)", (discord_id, region, summoner_name, summoner_id))
+        
+        self.cursor.execute("INSERT INTO Player (discordId, region, summonerName, summonerId) VALUES (?, ?, ?, ?)",
+            (discord_id, region, summoner_name, summoner_id)
+        )
         self.conn.commit()
         player = self.get_player(discord_id)
         if player is None:
@@ -35,9 +39,7 @@ class Player:
 
         :param discord_id: The discord id of the player.
         """
-
-        self.cursor.execute(f"SELECT * FROM players WHERE discord_id = ?", (discord_id))
-        self.conn.commit()
+        self.cursor.execute(f"SELECT * FROM Player WHERE (discordId) = (?)", (discord_id, ))
         return self.cursor.fetchone()
 
     def remove_player(self, server_id, player_id):
@@ -54,7 +56,7 @@ class Player:
         self.stinkson.remove_stinkson(server_id, player_id)
 
         if len(self.stinkson.get_servers(player_id)) == 0:
-            self.cursor.execute(f"DELETE FROM players WHERE discord_id = ?", (player_id))
+            self.cursor.execute(f"DELETE FROM Player WHERE discord_id = ?", (player_id))
             self.conn.commit()
             return True
         else:

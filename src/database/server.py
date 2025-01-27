@@ -23,8 +23,7 @@ class Server:
 
         :param discord_id: The discord id of server.
         """
-        self.cursor.execute(f"SELECT * FROM Server WHERE discordId = ?", (discord_id))
-        self.conn.commit()
+        self.cursor.execute(f"SELECT * FROM Server WHERE (discordId) = (?)", (discord_id,))
         return self.cursor.fetchone()
 
     def remove_server(self, discord_id):
@@ -33,5 +32,6 @@ class Server:
 
         :param discord_id: The discord id of server.
         """
-        self.cursor.execute(f"DELETE FROM Server WHERE discordId =  ?", (discord_id))
+        discord_id = [discord_id]
+        self.cursor.execute(f"DELETE FROM Server WHERE (discordId) = (?)", (discord_id))
         self.conn.commit()
