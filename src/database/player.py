@@ -51,11 +51,11 @@ class Player:
         """
         player = self.get_player(player_id)
         if player is None:
-            return Exception("Player not found")
+            raise Exception("Player not found")
         
         server = self.server.get_server(server_id)
         if server is None:
-            return Exception("Server not found")
+            raise Exception("Server not found")
         
         self.stinkson.remove_stinkson(server[0], player[0])
 

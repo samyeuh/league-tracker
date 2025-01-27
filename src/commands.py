@@ -4,6 +4,7 @@ from database.database import Database
 from discord import app_commands, Interaction, TextChannel, ui, TextStyle, SelectOption
 from discord.ext import commands
 from utils.checker import checkLink
+from utils.exceptions import LTException
 
 class LinkModal(ui.Modal, title="link your account"):
     def __init__(self, tracker: Tracker):
@@ -24,21 +25,15 @@ class LinkModal(ui.Modal, title="link your account"):
 
     async def on_submit(self, interaction: Interaction):
         self.region = self.region.value.upper()
-        errorEmbed = discord.Embed(title="Account not linked", description=f"Informations given (**{self.name}#{self.tag}** in region **{self.region}**) are incorrect, please check it and retry.", color=discord.Color.red())
         okEmbed = discord.Embed(title="Account linked", description=f"your account **{self.name}#{self.tag}** has been linked to region **{self.region}**", color=discord.Color.green())
-
-        if not checkLink(self.region, self.name, self.tag):
-            await interaction.response.send_message(embed=errorEmbed, ephemeral=True)
-            return
         
         try:
+            checkLink(self.region, self.name, self.tag)
             self.tracker.link(interaction.user, self.region, self.name, self.tag, interaction.guild.id)
-            embed = okEmbed
-        except Exception as e:
-            embed = errorEmbed
-            print(e)
+        except LTException as e:
+            await interaction.response.send_message(embed=e.getMessage(), ephemeral=True)
         
-        await interaction.response.send_message(embed=embed, ephemeral= (errorEmbed == embed))
+        await interaction.response.send_message(embed=okEmbed)
     
 class LeagueCommands(commands.Cog):
     def __init__(self, bot):
@@ -51,7 +46,11 @@ class LeagueCommands(commands.Cog):
     """
     async def is_admin(interaction: discord.Interaction) -> bool:
         """Vérifie si l'utilisateur a les permissions administrateur."""
-        return interaction.user.guild_permissions.administrator
+        if not interaction.user.guild_permissions.administrator:
+            embed = discord.Embed(title="Permission Error", description="You must be an administrator to use this command.", color=discord.Color.red())
+            await interaction.response.send_message(embed=embed, ephemeral=True)
+            return False
+        return True
 
     @app_commands.command(name="setup", description="Sets a special channel for the server")
     @app_commands.check(is_admin)
@@ -87,8 +86,13 @@ class LeagueCommands(commands.Cog):
     @app_commands.command(name="unlink", description="Unlink your discord account to your League of legends account")
     async def unlink(self, interaction: Interaction):
         """Délié ton compte discord de ton compte League of legends"""
-        self.tracker.unlink(interaction.user, interaction.guild_id)
-        await interaction.response.send_message(f'Account linked to {interaction.guild.name} has been unlinked', ephemeral=True)
+        try:
+            self.tracker.unlink(interaction.user, interaction.guild_id)
+        except LTException as e:
+            await interaction.response.send_message(embed=e.getMessage(), ephemeral=True)
+        
+        embed = discord.Embed(title="Account unlinked", description=f'Account linked to {interaction.guild.name} has been unlinked', color=discord.Color.green())
+        await interaction.response.send_message(embed=embed, ephemeral=True)
 
     @app_commands.command(name="profil", description="Display a summary of your league of legends profile")
     async def profil(self, interaction: Interaction):
