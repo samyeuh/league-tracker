@@ -49,14 +49,18 @@ class Player:
         :param server_id: The discord id of the server.
         :param discord_id: The discord id of the player.
         """
-
-        if self.get_player(player_id) is None:
+        player = self.get_player(player_id)
+        if player is None:
             return Exception("Player not found")
         
-        self.stinkson.remove_stinkson(server_id, player_id)
+        server = self.server.get_server(server_id)
+        if server is None:
+            return Exception("Server not found")
+        
+        self.stinkson.remove_stinkson(server[0], player[0])
 
-        if len(self.stinkson.get_servers(player_id)) == 0:
-            self.cursor.execute(f"DELETE FROM Player WHERE discord_id = ?", (player_id))
+        if len(self.stinkson.get_servers(player[0])) == 0:
+            self.cursor.execute(f"DELETE FROM Player WHERE (discordId) = (?)", (player_id, ))
             self.conn.commit()
             return True
         else:

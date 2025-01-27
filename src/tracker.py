@@ -38,9 +38,10 @@ class Tracker:
             return Exception("Error while getting account")
         self.player.add_player(user.id, region, account, accountId, serverDiscordId)
         
-    @requires_setup
-    def unlink(self):
-        pass
+    def unlink(self, user, serverDiscordId):
+        if not checker.checkSetup(self.server, serverDiscordId):
+            return Exception("Setup not done")
+        self.player.remove_player(serverDiscordId, user.id)
     
     @requires_setup
     def profil(self, user):

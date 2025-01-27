@@ -35,3 +35,13 @@ class Server:
         discord_id = [discord_id]
         self.cursor.execute(f"DELETE FROM Server WHERE (discordId) = (?)", (discord_id))
         self.conn.commit()
+    
+    def remove_server_byid(self, id):
+        """
+        Remove a server from the database.
+
+        :param id: The id of the server.
+        """
+        self.cursor.execute(f"DELETE FROM Server WHERE (id) = (?)", (id,))
+        self.conn.commit()
+        

@@ -28,22 +28,17 @@ class LinkModal(ui.Modal, title="link your account"):
         okEmbed = discord.Embed(title="Account linked", description=f"your account **{self.name}#{self.tag}** has been linked to region **{self.region}**", color=discord.Color.green())
 
         if not checkLink(self.region, self.name, self.tag):
-            errorEmbed.description += " Erreur lors du checklink"
-            embed = errorEmbed
-            await interaction.response.send_message(embed=embed)
+            await interaction.response.send_message(embed=errorEmbed, ephemeral=True)
             return
-        if not interaction.guild:
-            raise ValueError("Guild ID is missing")
         
         try:
             self.tracker.link(interaction.user, self.region, self.name, self.tag, interaction.guild.id)
             embed = okEmbed
         except Exception as e:
-            print(e)
-            errorEmbed.description += " Erreur lors du link + " + str(e)
             embed = errorEmbed
+            print(e)
         
-        await interaction.response.send_message(embed=embed)
+        await interaction.response.send_message(embed=embed, ephemeral= (errorEmbed == embed))
     
 class LeagueCommands(commands.Cog):
     def __init__(self, bot):
@@ -92,8 +87,8 @@ class LeagueCommands(commands.Cog):
     @app_commands.command(name="unlink", description="Unlink your discord account to your League of legends account")
     async def unlink(self, interaction: Interaction):
         """Délié ton compte discord de ton compte League of legends"""
-        # TODO: Implement this
-        await interaction.response.send_message(f'Unlinking {interaction.member.name}', ephemeral=True)
+        self.tracker.unlink(interaction.user, interaction.guild_id)
+        await interaction.response.send_message(f'Account linked to {interaction.guild.name} has been unlinked', ephemeral=True)
 
     @app_commands.command(name="profil", description="Display a summary of your league of legends profile")
     async def profil(self, interaction: Interaction):
