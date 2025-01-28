@@ -23,7 +23,6 @@ def get_riot_account(region, name, tag):
     response = requests.get(nametag_url.format(region=riotregion, name=name, tag=tag, api_key=os.getenv('API_KEY')))
     if response.status_code == 200:
         data = response.json()
-        print(data.get('puuid'))
         if not data.get('puuid'):
             raise ValueError("Invalid Riot account data: missing PUUID")
         return get_summoner_id(region, data.get('puuid')), data.get('puuid')
