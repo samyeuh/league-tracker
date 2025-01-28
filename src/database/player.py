@@ -7,7 +7,7 @@ class Player:
         self.cursor = database.getCursor()
         self.conn = database.getConn()
 
-    def add_player(self, discord_id, region, summoner_name, summoner_id, serverDiscordId):
+    def add_player(self, discord_id, region, summoner_name, account_id ,summoner_id, serverDiscordId):
         """
         Add a player on the database.
 
@@ -18,8 +18,8 @@ class Player:
         :param serverDiscordId: The guild id of the player.
         """
         
-        self.cursor.execute("INSERT INTO Player (discordId, region, summonerName, summonerId) VALUES (?, ?, ?, ?)",
-            (discord_id, region, summoner_name, summoner_id)
+        self.cursor.execute("INSERT INTO Player (discordId, region, summonerName, accountId, summonerId) VALUES (?, ?, ?, ?, ?)",
+            (discord_id, region, summoner_name, account_id, summoner_id)
         )
         self.conn.commit()
         player = self.get_player(discord_id)

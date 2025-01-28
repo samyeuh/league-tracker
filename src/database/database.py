@@ -21,9 +21,10 @@ class Database:
                   discordId VARCHAR(500) NOT NULL,
                   region VARCHAR(50) NOT NULL,
                   summonerName VARCHAR(500) NOT NULL,
+                  accountId VARCHAR(500) NOT NULL,
                   summonerId VARCHAR(500) NOT NULL,
                   UNIQUE(discordId),
-                  UNIQUE(summonerId)
+                  UNIQUE(accountId)
                );
             ''')
          self.conn.commit()

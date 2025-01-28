@@ -1,12 +1,13 @@
+import os
 import discord
 import asyncio
 from discord.ext import commands
+from dotenv import load_dotenv
 import logging
 
-# Configurer le logger de Discord.py
-logging.basicConfig(level=logging.INFO)  # Change `INFO` en `DEBUG` pour plus de détails
+load_dotenv()
+logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger("discord")
-
 
 intents = discord.Intents.all()
 bot = commands.Bot(intents=intents, command_prefix='lt.')
@@ -25,7 +26,7 @@ async def load_extension():
 
 async def main():
     await load_extension()
-    await bot.start('')
+    await bot.start(os.getenv("TOKEN"))
     
 if __name__ == "__main__":
     asyncio.run(main())

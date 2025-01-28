@@ -30,10 +30,12 @@ class LinkModal(ui.Modal, title="link your account"):
         try:
             checkLink(self.region, self.name, self.tag)
             self.tracker.link(interaction.user, self.region, self.name, self.tag, interaction.guild.id)
+            await interaction.response.send_message(embed=okEmbed)
         except LTException as e:
             await interaction.response.send_message(embed=e.getMessage(), ephemeral=True)
+            return
         
-        await interaction.response.send_message(embed=okEmbed)
+        
     
 class LeagueCommands(commands.Cog):
     def __init__(self, bot):

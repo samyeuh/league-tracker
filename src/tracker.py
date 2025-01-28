@@ -31,12 +31,9 @@ class Tracker:
     def link(self, user, region: str, name: TextInput, tag: TextInput, serverDiscordId):
         if not checker.checkSetup(self.server, serverDiscordId):
             raise LTException("Setup not done", "Please do the setup before trying to link an account")
-        result = api.riot.get_riot_account(region, name, tag)
-        account = name.value + "#" + tag.value
-        accountId = result.get('puuid')
-        if accountId is None:
-            raise LTException("API Error", "Error while getting account")
-        self.player.add_player(user.id, region, account, accountId, serverDiscordId)
+        summonerId, accountId = api.riot.get_riot_account(region, name, tag)
+        summonerName = name.value + "#" + tag.value
+        self.player.add_player(user.id, region, summonerName, accountId, summonerId, serverDiscordId)
         
     def unlink(self, user, serverDiscordId):
         if not checker.checkSetup(self.server, serverDiscordId):
