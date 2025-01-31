@@ -1,9 +1,11 @@
 from discord import TextChannel, TextInput
 from functools import wraps
-import api.riot
+import api.riot as riot
+import api.lol as lol
 from database.database import Database
 import utils.checker as checker
 from utils.exceptions import LTException
+import utils.embedder as embedder
 
 def requires_setup(method):
     """ Décorateur pour vérifier si `setup` a été appelé """
@@ -31,7 +33,7 @@ class Tracker:
     def link(self, user, region: str, name: TextInput, tag: TextInput, serverDiscordId):
         if not checker.checkSetup(self.server, serverDiscordId):
             raise LTException("Setup not done", "Please do the setup before trying to link an account")
-        summonerId, accountId = api.riot.get_riot_account(region, name, tag)
+        summonerId, accountId = riot.get_riot_account(region, name, tag)
         summonerName = name.value + "#" + tag.value
         self.player.add_player(user.id, region, summonerName, accountId, summonerId, serverDiscordId)
         
@@ -42,3 +44,17 @@ class Tracker:
     
     def profil(self, user):
         pass
+    
+    def getLastMatchs(self, user, gametype, serverDiscordId,count=5):
+        if not checker.checkSetup(self.server, serverDiscordId):
+            raise LTException("Setup not done", "Please do the setup before trying to get your last matchs")
+        player = self.player.get_player(user.id)
+        if player is None:
+            raise LTException("Player not found", "Please link your account before trying to get your last matchs")
+        matchsId = lol.get_last_matchs(player[4], player[2], gametype, count)
+        embedderList = []
+        for matchId in matchsId:
+            match = lol.get_match_info(matchId)
+            embed = embedder.matchEmbed(match)
+            embedderList.append(embed)
+        return embedderList if embedderList else None

@@ -104,17 +104,28 @@ class LeagueCommands(commands.Cog):
 
     @app_commands.command(name="last", description="Display the last five games played")
     @app_commands.choices(
-        type=[
-            app_commands.Choice(name="rankeds", value="rankeds"),
-            app_commands.Choice(name="drafts", value="drafts"),
-            app_commands.Choice(name="arams", value="arams"),
-            app_commands.Choice(name="all", value="all"),
+        gametype=[
+            app_commands.Choice(name="normal", value="type=normal&"),
+            app_commands.Choice(name="all ranked", value="type=ranked&"),
+            app_commands.Choice(name="ranked soloq" , value="queue=420&"),
+            app_commands.Choice(name="ranked flex"  , value="queue=440&"),
+            app_commands.Choice(name="arams", value="queue=450&"),
+            app_commands.Choice(name="urf"  , value="queue=900&"),
+            app_commands.Choice(name="all", value=""),
         ]
     )
-    async def last(self, interaction: Interaction, type: app_commands.Choice[str]):
-        """Affiche les dernières parties classées"""
-        # TODO: Implement this
-        await interaction.response.send_message(f'Last {type.name} games')
+    async def last(self, interaction: Interaction, count: int, gametype: app_commands.Choice[str]):
+        """Affiche les dernières parties"""
+        try:
+            await interaction.response.defer(ephemeral=True)
+            embedList = self.tracker.getLastMatchs(interaction.user, interaction.guild_id, gametype, count)
+        except LTException as e:
+            await interaction.followup.send(embed=e.getMessage(), ephemeral=True)
+        if embedList is not None:
+            await interaction.followup.send(embeds=embedList)
+        else:
+            noMatchEmbed = discord.Embed(title="No match found", description=f"No match found for type: **{gametype.name}**", color=discord.Color.red())
+            await interaction.followup.send(embed=noMatchEmbed, ephemeral=True)
 
 
 
