@@ -117,8 +117,8 @@ class LeagueCommands(commands.Cog):
     async def last(self, interaction: Interaction, count: int, gametype: app_commands.Choice[str]):
         """Affiche les dernières parties"""
         try:
-            await interaction.response.defer(ephemeral=True)
-            embedList = self.tracker.getLastMatchs(interaction.user, interaction.guild_id, gametype, count)
+            await interaction.response.defer()
+            embedList = self.tracker.getLastMatchs(interaction.user, gametype, interaction.guild_id, count)
         except LTException as e:
             await interaction.followup.send(embed=e.getMessage(), ephemeral=True)
         if embedList is not None:
